@@ -130,3 +130,4 @@ dmypy.json
 
 # ignoring lock files
 *.lock
+.DS_Store

@@ -129,8 +129,8 @@ def generae_fig_to_plot_std(df, year, width=330, height=300, hover_tools=HOVER_T
         x_range=list(df.index),
         tools=[ResetTool(), BoxZoomTool(), PanTool()],
         x_axis_label="Month",
-        y_axis_label="Total Events",
-        title = "Examining Follower Events over the Months",
+        y_axis_label="Total Events" if year == "y_2019" else None,
+        title = "Follower Events vs STD and Mean",
     )
 
     # fiddle with axis and ticks
@@ -164,7 +164,7 @@ def generae_fig_to_plot_std(df, year, width=330, height=300, hover_tools=HOVER_T
     tools = hover_tools["month"][0]
     fig.add_tools(tools)
 
-    # creates lines
+    # creates lines # for the legend legend_label=f"{year.split('_')[1]} mean", 
     fig.line(x=df.index, y=df[year], line_width=2, color="#756bb1")
-    fig.line(x=df.index, y=df[year].mean(), line_width=2, color="#31a354", legend_label=f"{year.split('_')[1]} average", line_dash="dotted")
+    fig.line(x=df.index, y=df[year].mean(), line_width=2, color="#31a354", line_dash="dotted")
     return fig

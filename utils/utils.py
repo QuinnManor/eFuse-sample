@@ -5,6 +5,7 @@ from bokeh.models.tools import HoverTool, ResetTool, BoxZoomTool, PanTool
 from bokeh.models import DatetimeTickFormatter, NumeralTickFormatter
 from bokeh.plotting import figure
 from bokeh.io import show, output_notebook
+import pandas as pd
 
 
 HOVER_TOOLS = {
@@ -99,3 +100,23 @@ def plot_multi_lines(df, width=330, height=300, hover_tools=HOVER_TOOLS):
     fig.line(x=df.index, y=df['y_2021'], line_width=2, color="#31a354", legend_label="2021")
 
     show(fig)
+
+
+def get_monthly_event_count(df):
+    df_copy = df.groupby("date", as_index=False).size().copy()
+    df_copy["year"] = df_copy["date"].dt.strftime('%Y')
+    df_copy["month"] = df_copy["date"].dt.strftime('%b')
+    df_copy = df_copy.groupby(["year", "month"], as_index=False).sum().rename(columns={"size":"total_events"})
+    return df_copy.set_index("month")
+
+
+def create_time_series_df(df, sd="2019-01-01", ed="2021-12-31", fill_nans=False):
+    date_range = pd.date_range(sd, ed).strftime("%b")
+    new_df = pd.DataFrame(index=date_range.unique())
+    for year in df.year.unique():
+        new_df[f"y_{year}"] = df[df["year"] == year]["total_events"]
+
+    if fill_nans:
+        new_df.fillna(method="ffill", inplace=True)
+        new_df.fillna(0, inplace=True)
+    return new_df

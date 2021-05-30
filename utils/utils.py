@@ -2,7 +2,7 @@ import os
 import git
 from pathlib import Path
 from bokeh.models.tools import HoverTool, ResetTool, BoxZoomTool, PanTool
-from bokeh.models import DatetimeTickFormatter, NumeralTickFormatter
+from bokeh.models import DatetimeTickFormatter, NumeralTickFormatter, FuncTickFormatter, BoxAnnotation
 from bokeh.plotting import figure
 from bokeh.io import show, output_notebook
 import pandas as pd
@@ -120,3 +120,51 @@ def create_time_series_df(df, sd="2019-01-01", ed="2021-12-31", fill_nans=False)
         new_df.fillna(method="ffill", inplace=True)
         new_df.fillna(0, inplace=True)
     return new_df
+
+
+def generae_fig_to_plot_std(df, year, width=330, height=300, hover_tools=HOVER_TOOLS, axis=AXIS, ticks=3):
+    fig = figure(
+        width=width,
+        height=height,
+        x_range=list(df.index),
+        tools=[ResetTool(), BoxZoomTool(), PanTool()],
+        x_axis_label="Month",
+        y_axis_label="Total Events",
+        title = "Examining Follower Events over the Months",
+    )
+
+    # fiddle with axis and ticks
+    fig.yaxis[0].formatter = NumeralTickFormatter(format="0,")
+    fig.axis.formatter = FuncTickFormatter(code="""
+    if (index % 2 == 0)
+    {
+    return tick;
+    }
+    else
+    {
+    return "";
+    }
+    """)
+    
+    # center title
+    fig.title.align = 'center'
+
+    y_mean = df[year].mean()
+    y_std = df[year].std()
+    upper_std = y_mean + y_std
+    
+    low_box = BoxAnnotation(top=y_std, fill_alpha=0.1, fill_color='red')
+    mid_box = BoxAnnotation(bottom=y_std, top=upper_std, fill_alpha=0.1, fill_color='green')
+    high_box = BoxAnnotation(bottom=upper_std, fill_alpha=0.1, fill_color='red')
+
+    fig.add_layout(low_box)
+    fig.add_layout(mid_box)
+    fig.add_layout(high_box)
+    
+    tools = hover_tools["month"][0]
+    fig.add_tools(tools)
+
+    # creates lines
+    fig.line(x=df.index, y=df[year], line_width=2, color="#756bb1")
+    fig.line(x=df.index, y=df[year].mean(), line_width=2, color="#31a354", legend_label=f"{year.split('_')[1]} average", line_dash="dotted")
+    return fig

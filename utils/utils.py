@@ -166,5 +166,6 @@ def generae_fig_to_plot_std(df, year, width=330, height=300, hover_tools=HOVER_T
 
     # creates lines # for the legend legend_label=f"{year.split('_')[1]} mean", 
     fig.line(x=df.index, y=df[year], line_width=2, color="#756bb1")
-    fig.line(x=df.index, y=df[year].mean(), line_width=2, color="#31a354", line_dash="dotted")
+    y = len(df.index) * [df[year].mean()]
+    fig.line(x=df.index, y=y, line_width=2, color="#31a354", line_dash="dotted")
     return fig

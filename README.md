@@ -27,7 +27,11 @@ The following sections detail how to run this project locally.
     │   └── raw  <- The raw data before cleaning.
     │
     ├── notebooks  <- Project notebooks.
-    │   ├── analysis  <- Analysis of indices and components
+    │   ├── 0 - eFuse Follower Events.ipynb  <- Light exploration and any additional data processing
+    │   ├── 1 - Follower Event EDA.ipynb <- Exploratory Data Analysis
+    │   ├── 2 - Social Network Analysis.ipynb <- Follower-Followee Network Graph (example)
+    |
+    ├── utils  <- utility and helper functions
     |
     ├── .gitignore  <- Specifies which files to ignore within the repository.
     |

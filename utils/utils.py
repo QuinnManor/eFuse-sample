@@ -6,7 +6,10 @@ from bokeh.models import DatetimeTickFormatter, NumeralTickFormatter, FuncTickFo
 from bokeh.plotting import figure
 from bokeh.io import show, output_notebook
 import pandas as pd
-
+# to visualize our network
+import networkx as nx
+import matplotlib.pyplot as plt
+plt.style.use('seaborn')
 
 HOVER_TOOLS = {
     "date": [HoverTool(
@@ -169,3 +172,18 @@ def generae_fig_to_plot_std(df, year, width=330, height=300, hover_tools=HOVER_T
     y = len(df.index) * [df[year].mean()]
     fig.line(x=df.index, y=y, line_width=2, color="#31a354", line_dash="dotted")
     return fig
+
+
+def get_followers(df, user_id):
+    return df.query(f"source == '{user_id}'").target.to_list()
+
+
+def plot_network_graph(graph, plot_groups=None):
+    pos = nx.spring_layout(graph)
+    f, ax = plt.subplots(figsize=(15, 10))
+    nodes = nx.draw_networkx_nodes(graph, pos, alpha=0.8)
+    if plot_groups is not None:
+        nodes = nx.draw_networkx_nodes(graph, pos, cmap=plt.cm.Set1, node_color=plot_groups['group'], alpha=0.8)
+        nodes.set_edgecolor('k')
+    nx.draw_networkx_labels(graph, pos, font_size=12)
+    nx.draw_networkx_edges(graph, pos)
